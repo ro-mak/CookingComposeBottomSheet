@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 class MainViewModel : ViewModel() {
 
     val state: MutableStateFlow<MainState> =
-        MutableStateFlow(MainState(MainBottomSheetContent.NoBottomSheetContent))
+        MutableStateFlow(MainState(MainBottomSheetContentState.NoBottomSheetContent))
 
 
 }
