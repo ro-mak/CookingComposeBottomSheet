@@ -3,9 +3,14 @@ package ru.makproductions.cookingbottomsheet
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
@@ -39,7 +44,8 @@ fun MainContent(state: MainState) {
         }
     })
     BottomSheetScaffold(
-        backgroundColor = Color.LightGray,
+        backgroundColor = Color.White,
+        sheetBackgroundColor = Color.Cyan,
         sheetElevation = 0.dp,
         scaffoldState = bottomSheetScaffoldState,
         sheetGesturesEnabled = false,
@@ -48,28 +54,46 @@ fun MainContent(state: MainState) {
         },
         modifier = Modifier.fillMaxSize(),
     ) {
-        Greeting("Bottomsheet cookers")
+        Column {
+            Greeting("Bottomsheet cookers")
+            val viewModel = viewModel(MainViewModel::class.java)
+            Button(onClick = {
+                viewModel.onChangeBottomSheetStateClick()
+            }) {
+                Text("Change bottomSheet state")
+            }
+        }
     }
 
 }
 
 @Composable
 fun MainBottomSheetContent(state: MainState) {
-    when (state.bottomSheetContent) {
-        MainBottomSheetContentState.NoBottomSheetContent -> {}
-        MainBottomSheetContentState.ButtonBottomSheetContent -> ButtonContent()
-        MainBottomSheetContentState.TextInputBottomSheetContent -> TextInputContent()
+    Box(modifier = Modifier.fillMaxWidth()) {
+        when (state.bottomSheetContent) {
+            MainBottomSheetContentState.NoBottomSheetContent -> {}
+            MainBottomSheetContentState.ButtonBottomSheetContent -> ButtonContent(
+                modifier = Modifier.align(
+                    Alignment.Center
+                )
+            )
+            MainBottomSheetContentState.TextInputBottomSheetContent -> TextInputContent(
+                modifier = Modifier.align(
+                    Alignment.Center
+                )
+            )
+        }
     }
 }
 
 @Composable
-fun TextInputContent() {
-    TextField(value = "", onValueChange = {})
+fun TextInputContent(modifier: Modifier) {
+    TextField(value = "", onValueChange = {}, modifier = modifier.fillMaxWidth())
 }
 
 @Composable
-fun ButtonContent() {
-    Button({}) {
+fun ButtonContent(modifier: Modifier) {
+    Button(modifier = modifier, onClick = {}) {
         Text(text = "Click me")
     }
 }
