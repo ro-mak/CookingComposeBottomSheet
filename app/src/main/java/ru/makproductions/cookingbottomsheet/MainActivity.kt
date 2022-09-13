@@ -3,17 +3,18 @@ package ru.makproductions.cookingbottomsheet
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import ru.makproductions.cookingbottomsheet.ui.theme.CookingComposeBottomSheetTheme
@@ -36,6 +37,15 @@ class MainActivity : ComponentActivity() {
 fun MainContent(state: MainState) {
     // A surface container using the 'background' color from the theme
     val bottomSheetScaffoldState = rememberBottomSheetScaffoldState()
+    val modalBottomSheetState =
+        rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
+    LaunchedEffect(key1 = state.modalBottomSheetState, block = {
+        if (state.modalBottomSheetState is MainModalBottomSheetState.NoBottomSheetContent) {
+            modalBottomSheetState.hide()
+        } else {
+            modalBottomSheetState.show()
+        }
+    })
     LaunchedEffect(key1 = state.bottomSheetContent, block = {
         if (state.bottomSheetContent is MainBottomSheetContentState.NoBottomSheetContent) {
             bottomSheetScaffoldState.bottomSheetState.collapse()
@@ -43,24 +53,39 @@ fun MainContent(state: MainState) {
             bottomSheetScaffoldState.bottomSheetState.expand()
         }
     })
-    BottomSheetScaffold(
-        backgroundColor = Color.White,
-        sheetBackgroundColor = Color.Cyan,
-        sheetElevation = 0.dp,
-        scaffoldState = bottomSheetScaffoldState,
-        sheetGesturesEnabled = false,
+    val viewModel = viewModel(MainViewModel::class.java)
+    ModalBottomSheetLayout(
         sheetContent = {
-            MainBottomSheetContent(state)
-        },
-        modifier = Modifier.fillMaxSize(),
+            MainModalBottomSheetContent(state)
+        }, sheetState = modalBottomSheetState
     ) {
-        Column {
-            Greeting("Bottomsheet cookers")
-            val viewModel = viewModel(MainViewModel::class.java)
-            Button(onClick = {
-                viewModel.onChangeBottomSheetStateClick()
-            }) {
-                Text("Change bottomSheet state")
+        BottomSheetScaffold(
+            backgroundColor = Color.White,
+            sheetBackgroundColor = Color.Cyan,
+            sheetElevation = 0.dp,
+            topBar = {
+                TopAppBar {
+                    IconButton(onClick = {
+                        viewModel.onMoreClick()
+                    }) {
+                        Image(painterResource(id = R.drawable.ic_baseline_more_vert_24), "")
+                    }
+                }
+            },
+            scaffoldState = bottomSheetScaffoldState,
+            sheetGesturesEnabled = false,
+            sheetContent = {
+                MainBottomSheetContent(state)
+            },
+            modifier = Modifier.fillMaxSize(),
+        ) {
+            Column {
+                Greeting("Bottomsheet cookers")
+                Button(onClick = {
+                    viewModel.onChangeBottomSheetStateClick()
+                }) {
+                    Text("Change bottomSheet state")
+                }
             }
         }
     }
@@ -78,6 +103,29 @@ fun MainBottomSheetContent(state: MainState) {
                 )
             )
             MainBottomSheetContentState.TextInputBottomSheetContent -> TextInputContent(
+                modifier = Modifier.align(
+                    Alignment.Center
+                )
+            )
+        }
+    }
+}
+
+@Composable
+fun MainModalBottomSheetContent(state: MainState) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .defaultMinSize(minHeight = 1.dp)
+    ) {
+        when (state.modalBottomSheetState) {
+            MainModalBottomSheetState.NoBottomSheetContent -> {}
+            MainModalBottomSheetState.ButtonBottomSheetContent -> ButtonContent(
+                modifier = Modifier.align(
+                    Alignment.Center
+                )
+            )
+            MainModalBottomSheetState.TextInputBottomSheetContent -> TextInputContent(
                 modifier = Modifier.align(
                     Alignment.Center
                 )

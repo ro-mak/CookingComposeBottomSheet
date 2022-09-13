@@ -16,8 +16,24 @@ class MainViewModel : ViewModel() {
         }
     }
 
+    fun onMoreClick() {
+        when (state.value.modalBottomSheetState) {
+            MainModalBottomSheetState.NoBottomSheetContent -> state.value =
+                state.value.copy(modalBottomSheetState = MainModalBottomSheetState.ButtonBottomSheetContent)
+            MainModalBottomSheetState.ButtonBottomSheetContent -> state.value =
+                state.value.copy(modalBottomSheetState = MainModalBottomSheetState.TextInputBottomSheetContent)
+            MainModalBottomSheetState.TextInputBottomSheetContent -> state.value =
+                state.value.copy(modalBottomSheetState = MainModalBottomSheetState.NoBottomSheetContent)
+        }
+    }
+
     val state: MutableStateFlow<MainState> =
-        MutableStateFlow(MainState(MainBottomSheetContentState.NoBottomSheetContent))
+        MutableStateFlow(
+            MainState(
+                MainBottomSheetContentState.NoBottomSheetContent,
+                MainModalBottomSheetState.NoBottomSheetContent
+            )
+        )
 
 
 }

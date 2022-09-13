@@ -4,5 +4,6 @@ import androidx.compose.runtime.Stable
 
 @Stable
 data class MainState(
-    val bottomSheetContent: MainBottomSheetContentState
+    val bottomSheetContent: MainBottomSheetContentState,
+    val modalBottomSheetState: MainModalBottomSheetState
 )
