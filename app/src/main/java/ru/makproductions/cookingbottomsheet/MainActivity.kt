@@ -1,5 +1,6 @@
 package ru.makproductions.cookingbottomsheet
 
+import android.content.res.Resources
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -14,12 +15,18 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import ru.makproductions.cookingbottomsheet.ui.theme.CookingComposeBottomSheetTheme
+
+private val Float.pxToDp: Dp
+    get() = (this / Resources.getSystem().displayMetrics.density).dp
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -27,6 +34,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             val viewModel = viewModel(MainViewModel::class.java)
+            val systemUiController = rememberSystemUiController()
             CookingComposeBottomSheetTheme {
                 MainContent(viewModel.state.collectAsState().value)
             }
@@ -41,6 +49,14 @@ fun MainContent(state: MainState) {
     val bottomSheetScaffoldState = rememberBottomSheetScaffoldState()
     val modalBottomSheetState =
         rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
+    val keyboardInsets = WindowInsets.ime
+    val bottomKeyboardPadding = keyboardInsets.asPaddingValues()
+        .calculateBottomPadding() - WindowInsets.systemBars.asPaddingValues()
+        .calculateBottomPadding()
+    val bottomPadding = bottomKeyboardPadding
+    val configuration = LocalConfiguration.current
+    val bottomSheetHeight =
+        configuration.screenHeightDp.dp - bottomSheetScaffoldState.bottomSheetState.offset.value.pxToDp
     LaunchedEffect(key1 = state.modalBottomSheetState, block = {
         if (state.modalBottomSheetState is MainModalBottomSheetState.NoBottomSheetContent) {
             modalBottomSheetState.hide()
@@ -59,12 +75,14 @@ fun MainContent(state: MainState) {
     ModalBottomSheetLayout(
         sheetContent = {
             MainModalBottomSheetContent(state)
-        }, sheetState = modalBottomSheetState
+        }, sheetState = modalBottomSheetState,
+        modifier = Modifier.fillMaxSize()
     ) {
         BottomSheetScaffold(
             backgroundColor = Color.White,
             sheetBackgroundColor = colorResource(id = R.color.purple_500),
             sheetElevation = 0.dp,
+            sheetPeekHeight = 0.dp,
             topBar = {
                 TopAppBar {
                     IconButton(onClick = {
@@ -77,9 +95,11 @@ fun MainContent(state: MainState) {
             scaffoldState = bottomSheetScaffoldState,
             sheetGesturesEnabled = false,
             sheetContent = {
-                MainBottomSheetContent(state)
+                MainBottomSheetContent(state, bottomPadding)
             },
-            modifier = Modifier.fillMaxSize(),
+            sheetShape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp),
+            modifier = Modifier
+                .fillMaxSize(),
         ) {
             Column {
                 Greeting("Bottomsheet cookers")
@@ -95,8 +115,12 @@ fun MainContent(state: MainState) {
 }
 
 @Composable
-fun MainBottomSheetContent(state: MainState) {
-    Box(modifier = Modifier.fillMaxWidth()) {
+fun MainBottomSheetContent(state: MainState, bottomPadding: Dp) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = bottomPadding)
+    ) {
         when (state.bottomSheetContent) {
             MainBottomSheetContentState.NoBottomSheetContent -> {}
             MainBottomSheetContentState.ButtonBottomSheetContent -> ButtonContent(
