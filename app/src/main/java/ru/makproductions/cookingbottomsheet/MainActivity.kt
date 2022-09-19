@@ -76,7 +76,6 @@ fun MainContent(state: MainState) {
     val bottomPadding =
         if (keyboardPadding > 0.dp) keyboardPadding else systemBarsBottomPadding
 
-    Log.d("Bottom padding", "Padding $bottomPadding")
     val viewModel = viewModel(MainViewModel::class.java)
     ModalBottomSheetLayout(
         sheetContent = {
