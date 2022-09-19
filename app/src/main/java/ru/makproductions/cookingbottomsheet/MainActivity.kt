@@ -2,6 +2,7 @@ package ru.makproductions.cookingbottomsheet
 
 import android.content.res.Resources
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
@@ -21,6 +22,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.core.view.WindowCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import ru.makproductions.cookingbottomsheet.ui.theme.CookingComposeBottomSheetTheme
@@ -31,10 +33,12 @@ private val Float.pxToDp: Dp
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        WindowCompat.setDecorFitsSystemWindows(window, false)
         setContent {
+
             val viewModel = viewModel(MainViewModel::class.java)
             val systemUiController = rememberSystemUiController()
+            WindowInsets.systemBars
             CookingComposeBottomSheetTheme {
                 MainContent(viewModel.state.collectAsState().value)
             }
@@ -42,18 +46,13 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialApi::class, ExperimentalLayoutApi::class)
 @Composable
 fun MainContent(state: MainState) {
     // A surface container using the 'background' color from the theme
     val bottomSheetScaffoldState = rememberBottomSheetScaffoldState()
     val modalBottomSheetState =
         rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
-    val keyboardInsets = WindowInsets.ime
-    val bottomKeyboardPadding = keyboardInsets.asPaddingValues()
-        .calculateBottomPadding() - WindowInsets.systemBars.asPaddingValues()
-        .calculateBottomPadding()
-    val bottomPadding = bottomKeyboardPadding
     val configuration = LocalConfiguration.current
     val bottomSheetHeight =
         configuration.screenHeightDp.dp - bottomSheetScaffoldState.bottomSheetState.offset.value.pxToDp
@@ -71,12 +70,21 @@ fun MainContent(state: MainState) {
             bottomSheetScaffoldState.bottomSheetState.expand()
         }
     })
+    val systemBarsBottomPadding =
+        WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
+    val keyboardPadding = WindowInsets.ime.asPaddingValues().calculateBottomPadding()
+    val bottomPadding =
+        if (keyboardPadding > 0.dp) keyboardPadding else systemBarsBottomPadding
+
+    Log.d("Bottom padding", "Padding $bottomPadding")
     val viewModel = viewModel(MainViewModel::class.java)
     ModalBottomSheetLayout(
         sheetContent = {
             MainModalBottomSheetContent(state)
         }, sheetState = modalBottomSheetState,
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
+            .statusBarsPadding()
     ) {
         BottomSheetScaffold(
             backgroundColor = Color.White,
