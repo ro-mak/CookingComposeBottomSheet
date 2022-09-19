@@ -70,11 +70,6 @@ fun MainContent(state: MainState) {
             bottomSheetScaffoldState.bottomSheetState.expand()
         }
     })
-    val systemBarsBottomPadding =
-        WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
-    val keyboardPadding = WindowInsets.ime.asPaddingValues().calculateBottomPadding()
-    val bottomPadding =
-        if (keyboardPadding > 0.dp) keyboardPadding else systemBarsBottomPadding
 
     val viewModel = viewModel(MainViewModel::class.java)
     ModalBottomSheetLayout(
@@ -102,7 +97,7 @@ fun MainContent(state: MainState) {
             scaffoldState = bottomSheetScaffoldState,
             sheetGesturesEnabled = false,
             sheetContent = {
-                MainBottomSheetContent(state, bottomPadding)
+                MainBottomSheetContent(state)
             },
             sheetShape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp),
             modifier = Modifier
@@ -122,11 +117,12 @@ fun MainContent(state: MainState) {
 }
 
 @Composable
-fun MainBottomSheetContent(state: MainState, bottomPadding: Dp) {
+fun MainBottomSheetContent(state: MainState) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(bottom = bottomPadding)
+            .navigationBarsPadding()
+            .imePadding()
     ) {
         when (state.bottomSheetContent) {
             MainBottomSheetContentState.NoBottomSheetContent -> {}
