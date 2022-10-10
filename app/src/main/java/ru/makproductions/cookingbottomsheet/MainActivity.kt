@@ -3,6 +3,7 @@ package ru.makproductions.cookingbottomsheet
 import android.content.res.Resources
 import android.os.Bundle
 import android.util.Log
+import android.widget.Space
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
@@ -78,6 +79,7 @@ fun MainContent(state: MainState) {
         modifier = Modifier
             .fillMaxSize()
             .statusBarsPadding()
+            .navigationBarsPadding()
     ) {
         BottomSheetScaffold(
             backgroundColor = Color.White,
