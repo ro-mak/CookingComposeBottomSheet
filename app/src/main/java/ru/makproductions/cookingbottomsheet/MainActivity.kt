@@ -125,6 +125,7 @@ fun MainBottomSheetContent(state: MainState) {
             .navigationBarsPadding()
             .imePadding()
     ) {
+        Spacer(modifier = Modifier.height(1.dp))
         when (state.bottomSheetContent) {
             MainBottomSheetContentState.NoBottomSheetContent -> {}
             MainBottomSheetContentState.ButtonBottomSheetContent -> ButtonContent(
