@@ -49,7 +49,6 @@ class MainActivity : ComponentActivity() {
 @OptIn(ExperimentalMaterialApi::class, ExperimentalLayoutApi::class)
 @Composable
 fun MainContent(state: MainState) {
-    // A surface container using the 'background' color from the theme
     val bottomSheetScaffoldState = rememberBottomSheetScaffoldState()
     val modalBottomSheetState =
         rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
