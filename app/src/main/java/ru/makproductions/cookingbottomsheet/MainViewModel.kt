@@ -27,6 +27,11 @@ class MainViewModel : ViewModel() {
         }
     }
 
+    fun onOpenDialogBottomSheetClick() {
+        events.tryEmit(OpenBottomSheetDialogEvent())
+    }
+
+    val events: MutableStateFlow<MainEvent> = MutableStateFlow(NoEvent())
     val state: MutableStateFlow<MainState> =
         MutableStateFlow(
             MainState(

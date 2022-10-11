@@ -6,6 +6,8 @@ import android.util.Log
 import android.widget.Space
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -24,17 +26,34 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
+import androidx.fragment.app.FragmentManager
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import ru.makproductions.cookingbottomsheet.ui.theme.CookingComposeBottomSheetTheme
 
 private val Float.pxToDp: Dp
     get() = (this / Resources.getSystem().displayMetrics.density).dp
 
-class MainActivity : ComponentActivity() {
+class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
+        val viewModelOldStyle: MainViewModel by viewModels()
+        viewModelOldStyle.viewModelScope.launch {
+            viewModelOldStyle.events.collect {
+                when (it) {
+                    is NoEvent -> {}
+                    is OpenBottomSheetDialogEvent -> {
+                        Log.d("Open", "BottomSheet")
+                        MainBottomSheetDialogFragment().show(supportFragmentManager, "tag")
+                    }
+                }
+            }
+        }
         setContent {
 
             val viewModel = viewModel(MainViewModel::class.java)
@@ -110,6 +129,11 @@ fun MainContent(state: MainState) {
                     viewModel.onChangeBottomSheetStateClick()
                 }) {
                     Text("Change bottomSheet state")
+                }
+                Button(onClick = {
+                    viewModel.onOpenDialogBottomSheetClick()
+                }) {
+                    Text("Open dialog bottom sheet")
                 }
             }
         }
