@@ -2,7 +2,6 @@ package ru.makproductions.cookingbottomsheet
 
 import android.content.res.Resources
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -48,7 +47,6 @@ class MainActivity : AppCompatActivity() {
                 when (it) {
                     is NoEvent -> {}
                     is OpenBottomSheetDialogEvent -> {
-                        Log.d("Open", "BottomSheet")
                         MainBottomSheetDialogFragment().show(supportFragmentManager, "tag")
                     }
                 }
