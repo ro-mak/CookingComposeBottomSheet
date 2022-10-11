@@ -55,7 +55,6 @@ class MainActivity : AppCompatActivity() {
         setContent {
 
             val viewModel = viewModel(MainViewModel::class.java)
-            WindowInsets.systemBars
             CookingComposeBottomSheetTheme {
                 MainContent(viewModel.state.collectAsState().value)
             }
