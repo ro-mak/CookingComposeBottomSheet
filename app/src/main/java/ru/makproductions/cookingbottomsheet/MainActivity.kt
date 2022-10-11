@@ -3,8 +3,6 @@ package ru.makproductions.cookingbottomsheet
 import android.content.res.Resources
 import android.os.Bundle
 import android.util.Log
-import android.widget.Space
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -13,26 +11,30 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
+import androidx.compose.material.ModalBottomSheetValue.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.core.graphics.ColorUtils
+import androidx.core.graphics.toColor
 import androidx.core.view.WindowCompat
-import androidx.fragment.app.FragmentManager
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.google.accompanist.systemuicontroller.SystemUiController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import ru.makproductions.cookingbottomsheet.ui.theme.CookingComposeBottomSheetTheme
 
 private val Float.pxToDp: Dp
@@ -57,7 +59,6 @@ class MainActivity : AppCompatActivity() {
         setContent {
 
             val viewModel = viewModel(MainViewModel::class.java)
-            val systemUiController = rememberSystemUiController()
             WindowInsets.systemBars
             CookingComposeBottomSheetTheme {
                 MainContent(viewModel.state.collectAsState().value)
@@ -71,8 +72,28 @@ class MainActivity : AppCompatActivity() {
 fun MainContent(state: MainState) {
     val bottomSheetScaffoldState = rememberBottomSheetScaffoldState()
     val modalBottomSheetState =
-        rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
+        rememberModalBottomSheetState(initialValue = Hidden)
     val configuration = LocalConfiguration.current
+    val statusBarColorDefault = colorResource(id = R.color.purple_700)
+    val systemUiController = rememberSystemUiController()
+    LaunchedEffect(key1 = modalBottomSheetState.offset.value, block = {
+        launch(Dispatchers.IO) {
+            val statusBarColorScrimmed =
+                Color(
+                    ColorUtils.blendARGB(
+                        statusBarColorDefault.toArgb(),
+                        Color.Black.toArgb(),
+                        0.2f
+                    )
+                )
+            val currentColor =
+                if (modalBottomSheetState.targetValue == Expanded || modalBottomSheetState.targetValue == HalfExpanded) statusBarColorScrimmed else statusBarColorDefault
+            withContext(Dispatchers.Main) {
+                systemUiController.setSystemBarsColor(currentColor)
+            }
+        }
+    })
+
     val bottomSheetHeight =
         configuration.screenHeightDp.dp - bottomSheetScaffoldState.bottomSheetState.offset.value.pxToDp
     LaunchedEffect(key1 = state.modalBottomSheetState, block = {
