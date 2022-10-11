@@ -99,6 +99,7 @@ fun MainContent(state: MainState) {
             .fillMaxSize()
             .statusBarsPadding()
             .navigationBarsPadding()
+            .imePadding()
     ) {
         BottomSheetScaffold(
             backgroundColor = Color.White,
