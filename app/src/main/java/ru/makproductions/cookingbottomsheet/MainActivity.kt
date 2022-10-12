@@ -5,6 +5,8 @@ import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -102,7 +104,7 @@ fun MainContent(state: MainState) {
         if (state.bottomSheetContent is MainBottomSheetContentState.NoBottomSheetContent) {
             bottomSheetScaffoldState.bottomSheetState.collapse()
         } else {
-            bottomSheetScaffoldState.bottomSheetState.expand()
+            bottomSheetScaffoldState.bottomSheetState.animateTo(BottomSheetValue.Expanded, spring(Spring.DampingRatioHighBouncy))
         }
     })
 
@@ -134,7 +136,7 @@ fun MainContent(state: MainState) {
             scaffoldState = bottomSheetScaffoldState,
             sheetGesturesEnabled = false,
             sheetContent = {
-                MainBottomSheetContent(state)
+                MainBottomSheetContent(state, bottomSheetHeight)
             },
             sheetShape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp),
             modifier = Modifier
@@ -159,11 +161,12 @@ fun MainContent(state: MainState) {
 }
 
 @Composable
-fun MainBottomSheetContent(state: MainState) {
+fun MainBottomSheetContent(state: MainState, height: Dp) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .navigationBarsPadding()
+            .height(if (height < 80.dp) 80.dp else height)
             .imePadding()
     ) {
         Spacer(modifier = Modifier.height(1.dp))
