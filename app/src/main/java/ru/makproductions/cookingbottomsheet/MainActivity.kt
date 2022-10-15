@@ -13,9 +13,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.ModalBottomSheetValue.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -211,9 +209,10 @@ fun MainModalBottomSheetContent(state: MainState) {
 
 @Composable
 fun TextInputContent(modifier: Modifier) {
+    var text by remember { mutableStateOf("")}
     TextField(
-        value = "",
-        onValueChange = {},
+        value = text,
+        onValueChange = {text = it},
         modifier = modifier
             .fillMaxWidth()
             .padding(16.dp)
