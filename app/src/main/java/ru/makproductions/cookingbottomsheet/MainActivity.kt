@@ -136,7 +136,7 @@ fun MainContent(state: MainState) {
             scaffoldState = bottomSheetScaffoldState,
             sheetGesturesEnabled = false,
             sheetContent = {
-                MainBottomSheetContent(state, bottomSheetHeight)
+                MainBottomSheetContent(state)
             },
             sheetShape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp),
             modifier = Modifier
@@ -161,12 +161,12 @@ fun MainContent(state: MainState) {
 }
 
 @Composable
-fun MainBottomSheetContent(state: MainState, height: Dp) {
+fun MainBottomSheetContent(state: MainState) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .navigationBarsPadding()
-            .height(if (height < 80.dp) 80.dp else height)
+            .height(80.dp)
             .imePadding()
     ) {
         Spacer(modifier = Modifier.height(1.dp))
